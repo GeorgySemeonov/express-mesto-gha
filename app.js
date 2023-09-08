@@ -27,8 +27,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
-
   app.use(express.json());
   app.use(CardsRouter);
   app.use(UserRouter);

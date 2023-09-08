@@ -15,22 +15,41 @@ module.exports.getUser = (req, res) => {
 //Найти пользователя по id
 module.exports.getUserById = (req, res) => {
 
-  //const { id } = req.user._id;
- // console.log(id);
-  return userModel.findById(req.user._id)
+  const id = req.user._id;
+ console.log(id);
+  return userModel.findById(id)
   .then(r => {
-    if (r === null) {
-        return res.status(404).send({ message: " Пользователь по указанному _id не найден" });
-    }
-    return res.status(200).send(r);
+    if (r.name === "CastError") {
+      return res.status(400).send({ message: "Некорректный _id" });
+  }
+  return res.status(200).send(r);
 })
 .catch((e) => {
-    if (e.name === "CastError") {
-        return res.status(400).send({ message: "Некорректный _id" });
-    }
-    return res.status(500).send({message: "Ошибка по умолчанию"});
+  if (e === null) {
+    return res.status(404).send({ message: " Пользователь по указанному _id не найден" });
+}
+return res.status(500).send({message: "Ошибка по умолчанию"});
+
 });
 };
+
+// module.exports.getUserById = (req , res) => {
+//   const { userID } = req.params;
+//   console.log(req.params);
+//   return userModel.findById(userID)
+//       .then(r => {
+//           if (r === null) {
+//               return res.status(404).send({ message: "User not found" });
+//           }
+//           return res.status(200).send(r);
+//       })
+//       .catch((e) => {
+//           if (e.name === "CastError") {
+//               return res.status(400).send({ message: "Invalid ID" });
+//           }
+//           return res.status(500).send({message: "Server Error"});
+//       });
+// }
 
 //Создаёт пользователя
 module.exports.createUser = (req, res, next) => {
@@ -56,16 +75,16 @@ module.exports.createUser = (req, res, next) => {
 module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
 
-  return userModel.findByIdAndUpdate(req.user._id,{ name, about },{new: true})
+  return userModel.findByIdAndUpdate(req.user._id,{ name, about },{new: true, runValidators: true,})
 
     .then(r => {
-    return res.status(201).send(r);
+    return res.status(200).send(r);
 })
     .catch((e) => {
       if (e.name === 'CastError') {
-        return res.status(400).send({ message: " Переданы некорректные данные при обновлении профиля" });
+        return res.status(500).send({ message: "Ошибка по умолчанию " });
 
-      } return res.status(500).send({message: "Ошибка по умолчанию"});
+      } return res.status(400).send({message: "Переданы некорректные данные при обновлении профиля"});
     });
 };
 
@@ -76,7 +95,7 @@ module.exports.updateAvatar = (req, res, next) => {
   return userModel.findByIdAndUpdate(req.user._id,{ avatar},{new: true})
 
   .then(r => {
-    return res.status(201).send(r);
+    return res.status(200).send(r);
 })
     .catch((e) => {
       if (e.name === 'CastError') {
