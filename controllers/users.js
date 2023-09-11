@@ -1,14 +1,15 @@
 const userModel = require("../models/user");
 const mongoose = require("mongoose");
+const { HTTP_STATUS_BAD_REQUEST, HTTP_STATUS_OK, HTTP_STATUS_CREATED, HTTP_STATUS_INTERNAL_SERVER_ERROR, HTTP_STATUS_NOT_FOUND } = require('http2').constants;
 
 //Список всех пользователей
 module.exports.getUser = (req, res) => {
   return userModel.find({})
-  .then(r => {
-    return res.status(200).send(r);
+  .then(user => {
+    return res.status(HTTP_STATUS_OK).send(user);
 })
 .catch((e) => {
-    return res.status(500).send({message: "Ошибка по умолчанию"});
+    return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({message: "Ошибка по умолчанию"});
 });
 };
 
@@ -18,17 +19,18 @@ module.exports.getUserById = (req, res) => {
   const id = req.user._id;
  console.log(id);
   return userModel.findById(id)
-  .then(r => {
-    if (r.name === "CastError") {
-      return res.status(400).send({ message: "Некорректный _id" });
+  .then(user => {
+    if (user === null) {
+      return res.status(HTTP_STATUS_NOT_FOUND).send({ message: " Пользователь по указанному _id не найден" });
   }
-  return res.status(200).send(r);
+
+  return res.status(HTTP_STATUS_OK).send(user);
 })
-.catch((e) => {
-  if (e === null) {
-    return res.status(404).send({ message: " Пользователь по указанному _id не найден" });
+.catch((err) => {
+  if (err.name === "CastError") {
+    return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: "Некорректный _id" });
 }
-return res.status(500).send({message: "Ошибка по умолчанию"});
+return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({message: "Ошибка по умолчанию"});
 
 });
 };
@@ -58,16 +60,16 @@ module.exports.createUser = (req, res, next) => {
   } = req.body;
   return userModel.create({ name, about, avatar})
 
-  .then(r => {
-    return res.status(201).send(r);
+  .then(user => {
+    return res.status(HTTP_STATUS_CREATED).send(user);
 })
 .catch((e) => {
      console.log(e.name);
     if (e instanceof mongoose.Error.ValidationError) {
-        res.status(400).send({ message: "Переданы некорректные данные при создании пользователя" });
+        res.status(HTTP_STATUS_BAD_REQUEST).send({ message: "Переданы некорректные данные при создании пользователя" });
         return next();
     }
-    return res.status(500).send({message: "Ошибка по умолчанию"});
+    return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({message: "Ошибка по умолчанию"});
 });
 };
 
@@ -77,30 +79,30 @@ module.exports.updateUser = (req, res) => {
 
   return userModel.findByIdAndUpdate(req.user._id,{ name, about },{new: true, runValidators: true,})
 
-    .then(r => {
-    return res.status(200).send(r);
+    .then(user => {
+    return res.status(HTTP_STATUS_OK).send(user);
 })
     .catch((e) => {
-      if (e.name === 'CastError') {
-        return res.status(500).send({ message: "Ошибка по умолчанию " });
+      if (e instanceof mongoose.Error.ValidationError) {
+        return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: "Ошибка по умолчанию " });
 
-      } return res.status(400).send({message: "Переданы некорректные данные при обновлении профиля"});
+      } return res.status(HTTP_STATUS_BAD_REQUEST).send({message: "Переданы некорректные данные при обновлении профиля"});
     });
 };
 
 //Обновить аватар
-module.exports.updateAvatar = (req, res, next) => {
+module.exports.updateAvatar = (req, res ) => {
   const { avatar } = req.body;
 
-  return userModel.findByIdAndUpdate(req.user._id,{ avatar},{new: true})
+  return userModel.findByIdAndUpdate(req.user._id,{ avatar},{new: true, runValidators: true, })
 
-  .then(r => {
-    return res.status(200).send(r);
+  .then(user => {
+    return res.status(HTTP_STATUS_OK).send(user);
 })
     .catch((e) => {
-      if (e.name === 'CastError') {
-        return res.status(400).send({ message: " Переданы некорректные данные при обновлении аватара" });
+      if (e instanceof mongoose.Error.ValidationError) {
+        return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: " Переданы некорректные данные при обновлении аватара" });
 
-      } return res.status(500).send({message: "Ошибка по умолчанию"});
+      } return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({message: "Ошибка по умолчанию"});
     });
 };

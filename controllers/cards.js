@@ -1,14 +1,15 @@
 const cardModel = require('../models/card');
 const mongoose = require("mongoose");
+const { HTTP_STATUS_BAD_REQUEST, HTTP_STATUS_OK, HTTP_STATUS_CREATED, HTTP_STATUS_INTERNAL_SERVER_ERROR, HTTP_STATUS_NOT_FOUND } = require('http2').constants;
 
 //Все карточки
 module.exports.getCard = (req, res) => {
   return cardModel.find({})
-  .then(r => {
-    return res.status(200).send(r);
+  .then(user => {
+    return res.status(HTTP_STATUS_OK).send(user);
 })
 .catch((e) => {
-    return res.status(500).send({message: "Ошибка по умолчанию."});
+    return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({message: "Ошибка по умолчанию."});
 });
 };
 
@@ -18,16 +19,16 @@ module.exports.createCard = (req, res, next) => {
   //const { id } = req.user._id;
 
   return cardModel.create({ name, link })
-  .then(r => {
-    return res.status(201).send(r);
+  .then(user => {
+    return res.status(HTTP_STATUS_CREATED).send(user);
 })
 .catch((e) => {
      console.log(e.name);
     if (e instanceof mongoose.Error.ValidationError) {
-        res.status(400).send({ message: "Переданы некорректные данные при создании карточки" });
+        res.status(HTTP_STATUS_BAD_REQUEST).send({ message: "Переданы некорректные данные при создании карточки" });
         return next();
     }
-    return res.status(500).send({message: "Ошибка по умолчанию."});
+    return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({message: "Ошибка по умолчанию."});
 });
 };
 
@@ -37,11 +38,11 @@ module.exports.deleteCard = (req, res) => {
   //const { id } = req.user._id;
   console.log(cardId);
   return cardModel.findByIdAndDelete(cardId)
-  .then(r => {
-    if (r === null) {
-        return res.status(404).send({ message: " Карточка с указанным _id не найдена" });
+  .then(user => {
+    if (user === null) {
+        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: " Карточка с указанным _id не найдена" });
     }
-    return res.status(200).send(r);
+    return res.status(HTTP_STATUS_OK).send(user);
 })
 };
 
@@ -49,18 +50,18 @@ module.exports.deleteCard = (req, res) => {
 module.exports.likeCard = (req, res) => {
   const { cardId } = req.params;
   return cardModel.findByIdAndUpdate(cardId,{ $addToSet: { likes: req.user._id } },{ new: true })
-  .then(r => {
-    if (r === null) {
-        return res.status(404).send({ message: "Передан несуществующий _id карточки" });
+  .then(user => {
+    if (user === null) {
+        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: "Передан несуществующий _id карточки" });
     }
-    return res.status(200).send(r);
+    return res.status(HTTP_STATUS_OK).send(user);
 })
 .catch((e) => {
   console.log(e.name);
     if (e.name === "CastError") {
-        return res.status(400).send({ message: "Переданы некорректные данные для постановки/снятии лайка" });
+        return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: "Переданы некорректные данные для постановки/снятии лайка" });
     }
-    return res.status(500).send({message: "Ошибка по умолчанию."});
+    return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({message: "Ошибка по умолчанию."});
 });
 };
 
@@ -68,18 +69,18 @@ module.exports.likeCard = (req, res) => {
 module.exports.dislikeCard = (req, res) => {
   const { cardId } = req.params;
   return cardModel.findByIdAndUpdate(cardId,{ $pull: { likes: req.user._id } },{ new: true })
-  .then(r => {
-    if (r === null) {
-        return res.status(404).send({ message: "Передан несуществующий _id карточки" });
+  .then(user => {
+    if (user === null) {
+        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: "Передан несуществующий _id карточки" });
     }
-    return res.status(200).send(r);
+    return res.status(HTTP_STATUS_OK).send(user);
 })
 .catch((e) => {
   console.log(e.name);
     if (e.name === "CastError") {
-        return res.status(400).send({ message: "Переданы некорректные данные для постановки/снятии лайка" });
+        return res.status(HTTP_STATUS_BAD_REQUEST).send({ message: "Переданы некорректные данные для постановки/снятии лайка" });
     }
-    return res.status(500).send({message: "Ошибка по умолчанию"});
+    return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({message: "Ошибка по умолчанию"});
 });
 
     };
