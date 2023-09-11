@@ -84,9 +84,9 @@ module.exports.updateUser = (req, res) => {
 })
     .catch((e) => {
       if (e instanceof mongoose.Error.ValidationError) {
-        return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: "Ошибка по умолчанию " });
 
-      } return res.status(HTTP_STATUS_BAD_REQUEST).send({message: "Переданы некорректные данные при обновлении профиля"});
+        return res.status(HTTP_STATUS_BAD_REQUEST).send({message: "Переданы некорректные данные при обновлении профиля"});
+      } return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: "Ошибка по умолчанию " });
     });
 };
 
