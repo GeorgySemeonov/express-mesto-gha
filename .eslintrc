@@ -1,4 +1,0 @@
-{
-  "extends": "airbnb-base",
-  "allow": ["foo_", "_bar"]
-}

@@ -15,8 +15,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb')
     console.log('No connection to DB');
   });
 
-
-app.get('/',(req , res) =>{
+app.get('/', (req, res) =>{
   res.status(200).send('Hello!');
 })
 app.use((req, res, next) => {
