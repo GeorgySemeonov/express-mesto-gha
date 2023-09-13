@@ -44,6 +44,9 @@ module.exports.deleteCard = (req, res) => {
     }
     return res.status(HTTP_STATUS_OK).send(user);
 })
+.catch(() => {
+    return res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({message: "Ошибка по умолчанию."});
+});
 };
 
 //Добавить лайк карточке
