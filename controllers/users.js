@@ -41,7 +41,7 @@ userModel.findById(id)
       ));
     } else if (err.name === 'DocumentNotFoundError') {
       next(new NotFoundError(
-        'Пользователь по указанному id не найден.',
+        'Пользователь по указанному id не найден',
       ));
     } else {
       next(err);
@@ -93,10 +93,10 @@ module.exports.createUser = (req, res, next) => {
 .catch((e) => {
      console.log(e.name);
      if (e.code === 11000) {
-      next(new ConflictError('Такой пользователь уже существует.'));
+      next(new ConflictError('Такой пользователь уже существует'));
     } else if (e.name === 'ValidationError') {
       next(new BadRequestError(
-        'Переданы некорректные данные при создании пользователя.',
+        'Переданы некорректные данные при создании пользователя',
       ));
     } else {
       next(e);
@@ -153,7 +153,7 @@ module.exports.updateUser = (req, res, next) => {
   .catch((err) => {
     if (err.name === 'CastError' || err.name === 'ValidationError') {
       next(new BadRequestError(
-        'Переданы некорректные данные при обновлении профиля.',
+        'Переданы некорректные данные при обновлении профиля',
       ));
     } else {
       next(err);
@@ -181,12 +181,12 @@ module.exports.updateAvatar = (req, res, next ) => {
   .catch((err) => {
     if (err.name === 'ValidationError' || err.name === 'CastError') {
       next(new BadRequestError(
-        'Переданы некорректные данные при обновлении аватара.',
+        'Переданы некорректные данные при обновлении аватара',
       ));
     }
     if (err.name === 'DocumentNotFoundError') {
       next(new NotFoundError(
-        'Пользователь с указанным _id не найден.',
+        'Пользователь с указанным _id не найден',
       ));
     } else {
       next(err);
