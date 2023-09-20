@@ -1,14 +1,16 @@
 const router = require("express").Router();
 const { celebrate, Joi } = require('celebrate');
 const { regexp } = require('../utils/regexp')
-const { getUser, getUserById, updateUser, updateAvatar } = require("../controllers/users");
+const { getUsers, getUserById, updateUser, updateAvatar, getUser } = require("../controllers/users");
 
-router.get("/users", getUser);
+router.get("/users", getUsers);
+router.get("/users/:id", getUserById);
+
 router.get("/users/me",celebrate({
   params: Joi.object().keys({
     userId: Joi.string().length(24).hex().required(),
   }),
-}), getUserById);
+}), getUser);
 // router.post("/users", createUser);
 router.patch("/users/me",
 celebrate({

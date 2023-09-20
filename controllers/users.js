@@ -15,7 +15,7 @@ const ConflictError = require('../errors/ConflictError');
 const SALT_ROUNDS = 10;
 
 //Список всех пользователей
-module.exports.getUser = (req, res) => {
+module.exports.getUsers = (req, res) => {
   return userModel.find({})
   .then(user => {
     return res.status(HTTP_STATUS_OK).send(user);
@@ -25,11 +25,35 @@ module.exports.getUser = (req, res) => {
 });
 };
 
-//Найти пользователя по id
-module.exports.getUserById = (req, res, next) => {
+//Найти текущего пользователя
+module.exports.getUser = (req, res, next) => {
 
   //const id = req.user._id;
   const { id } = req.user;
+ console.log(id);
+userModel.findById(id)
+  .orFail()
+  .then((user) => res.status(HTTP_STATUS_OK).send(user))
+  .catch((err) => {
+    if (err.name === 'CastError') {
+      next(new BadRequestError(
+        'Некорректные данные при поиске пользователя по _id',
+      ));
+    } else if (err.name === 'DocumentNotFoundError') {
+      next(new NotFoundError(
+        'Пользователь по указанному id не найден',
+      ));
+    } else {
+      next(err);
+    }
+  });
+};
+
+//Найти пользователя по id
+module.exports.getUserById = (req, res, next) => {
+
+  const {id} = req.params;
+  //const { id } = req.user;
  console.log(id);
 userModel.findById(id)
   .orFail()
