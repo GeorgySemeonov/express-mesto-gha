@@ -94,12 +94,12 @@ module.exports.createUser = (req, res, next) => {
      console.log(e.name);
      if (e.code === 11000) {
       next(new ConflictError('Такой пользователь уже существует.'));
-    } else if (err.name === 'ValidationError') {
+    } else if (e.name === 'ValidationError') {
       next(new BadRequestError(
         'Переданы некорректные данные при создании пользователя.',
       ));
     } else {
-      next(err);
+      next(e);
     }
   });
 };
