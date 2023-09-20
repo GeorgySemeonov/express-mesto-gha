@@ -34,7 +34,7 @@ app.get('/', (req, res) =>{
     }),
   }),login);
 
-  app.post('/signup',celebrate({
+  app.post('/signup', celebrate({
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
@@ -58,7 +58,7 @@ app.get('/', (req, res) =>{
   });
   console.log(message)
   });
-
+  app.use(errors());
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 });
