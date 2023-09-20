@@ -51,6 +51,7 @@ app.get('/', (req, res) =>{
     res.status(HTTP_STATUS_NOT_FOUND).send({message: "Страница не найдена"});
   }) ;
 
+  app.use(errors());
   app.use((err, req, res, next) => {
     const { statusCode = 500, message } = err;
     res.status(statusCode).send(
@@ -58,7 +59,7 @@ app.get('/', (req, res) =>{
   });
   console.log(message)
   });
-  app.use(errors());
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 });
