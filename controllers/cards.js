@@ -1,5 +1,5 @@
-const cardModel = require("../models/card");
-const mongoose = require("mongoose");
+const cardModel = require('../models/card');
+// const mongoose = require("mongoose");
 // const {
 //   HTTP_STATUS_BAD_REQUEST,
 //   HTTP_STATUS_OK,
@@ -32,8 +32,7 @@ module.exports.getCard = (req, res, next) => {
     .catch(next);
 };
 
-
-//Создать карточку
+// Создать карточку
 // module.exports.createCard = (req, res, next) => {
 //   const { name, link } = req.body;
 //   const id = req.user._id;
@@ -59,7 +58,7 @@ module.exports.getCard = (req, res, next) => {
 
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
-  const  id  = req.user._id;
+  const id = req.user._id;
   // console.log(id);
   cardModel.create({ name, link, owner: id })
     .then((card) => {
@@ -109,7 +108,7 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  const id  = req.user._id;
+  const id = req.user._id;
 
   cardModel.findById(cardId)
     .orFail()
@@ -137,15 +136,14 @@ module.exports.deleteCard = (req, res, next) => {
     });
 };
 
-
-//Добавить лайк карточке
+// Добавить лайк карточке
 module.exports.likeCard = (req, res, next) => {
   const { cardId } = req.params;
-   cardModel
+  cardModel
     .findByIdAndUpdate(
       cardId,
       { $addToSet: { likes: req.user._id } },
-      { new: true }
+      { new: true },
     )
     .orFail()
     .then((card) => res.send(card))
@@ -160,49 +158,49 @@ module.exports.likeCard = (req, res, next) => {
         next(err);
       }
     });
-    // .then((card) => {
-    //   if (card === null) {
-    //     return res
-    //       .status(HTTP_STATUS_NOT_FOUND)
-    //       .send({ message: "Передан несуществующий _id карточки" });
-    //   }
-    //   return res.status(HTTP_STATUS_OK).send(card);
-    // })
-    // .catch((e) => {
-    //   console.log(e.name);
-    //   if (e.name === "CastError") {
-    //     return res.status(HTTP_STATUS_BAD_REQUEST).send({
-    //       message: "Переданы некорректные данные для постановки/снятии лайка",
-    //     });
-    //   }
-    //   return res
-    //     .status(HTTP_STATUS_INTERNAL_SERVER_ERROR)
-    //     .send({ message: "Ошибка по умолчанию." });
-    // });
+  // .then((card) => {
+  //   if (card === null) {
+  //     return res
+  //       .status(HTTP_STATUS_NOT_FOUND)
+  //       .send({ message: "Передан несуществующий _id карточки" });
+  //   }
+  //   return res.status(HTTP_STATUS_OK).send(card);
+  // })
+  // .catch((e) => {
+  //   console.log(e.name);
+  //   if (e.name === "CastError") {
+  //     return res.status(HTTP_STATUS_BAD_REQUEST).send({
+  //       message: "Переданы некорректные данные для постановки/снятии лайка",
+  //     });
+  //   }
+  //   return res
+  //     .status(HTTP_STATUS_INTERNAL_SERVER_ERROR)
+  //     .send({ message: "Ошибка по умолчанию." });
+  // });
 };
 
-//Удалить лайк с карточки
-module.exports.dislikeCard = (req, res) => {
+// Удалить лайк с карточки
+module.exports.dislikeCard = (req, res, next) => {
   const { cardId } = req.params;
   cardModel
-   .findByIdAndUpdate(
-     cardId,
-     { $pull: { likes: req.user._id } },
-     { new: true }
-   )
-   .orFail()
-   .then((card) => res.send(card))
-   .catch((err) => {
-     if (err.name === 'CastError') {
-       next(new BadRequestError(
-         'Переданы некорректные данные для постановки/снятии лайка.',
-       ));
-     } else if (err.name === 'DocumentNotFoundError') {
-       next(new NotFoundError('Передан несуществующий _id карточки.'));
-     } else {
-       next(err);
-     }
-   });
+    .findByIdAndUpdate(
+      cardId,
+      { $pull: { likes: req.user._id } },
+      { new: true },
+    )
+    .orFail()
+    .then((card) => res.send(card))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError(
+          'Переданы некорректные данные для постановки/снятии лайка.',
+        ));
+      } else if (err.name === 'DocumentNotFoundError') {
+        next(new NotFoundError('Передан несуществующий _id карточки.'));
+      } else {
+        next(err);
+      }
+    });
 
   // const { cardId } = req.params;
   // return cardModel
