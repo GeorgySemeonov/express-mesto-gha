@@ -197,11 +197,10 @@ module.exports.updateUser = (req, res, next) => {
             'Переданы некорректные данные при обновлении профиля',
           ),
         );
-        if (err.name === 'DocumentNotFoundError') {
-          next(new NotFoundError('Пользователь с указанным _id не найден'));
-        } else {
-          next(err);
-        }
+      } else if (err.name === 'DocumentNotFoundError') {
+        next(new NotFoundError('Пользователь с указанным _id не найден'));
+      } else {
+        next(err);
       }
     });
 };
